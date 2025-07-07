@@ -26,11 +26,6 @@ Q-Detection, a quantum-accelerated method, is shown to achieve the best balance 
 | `rate`       | Poisoning rate (%)               | `3`, `5`, `10`, `20`, `30`                                |
 | `subset_num` | # samples selected by the filter | `4000` (default)                                          |
 
-### Metrics
-
-* **NCR** – see *IJCAI 2025* paper “*Q-Detection: A Quantum-Classic Hybrid Poison Attack Detection Method*” for definition.
-* **Accuracy** – overall test accuracy (`baseline_test_acc`) and target-label accuracy (`baseline_target_acc`).
-
 ## How to Run
 
 1. **Set up the environment**
@@ -40,6 +35,8 @@ Q-Detection, a quantum-accelerated method, is shown to achieve the best balance 
    source venv/bin/activate
    pip install -r requirements.txt
    ```
+   Download dataset gtsrb_dataset.h5 form this link https://drive.google.com/file/d/1SKYMwrnjEyFjjc7UWTdAyAjFI_demNtD/view and put it under './dataset' folder.
+    
 2. **Adjust hyper-parameters** in `main.py` (`methodname`, `rate`, `subset_num`).
 3. **Launch** via an IDE run of `main.py` or:
 
