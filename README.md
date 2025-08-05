@@ -1,66 +1,117 @@
-# QDetection
+# Q-Detection Repository
 
-## Project Overview
+**Q-Detection: A Quantum–Classical Hybrid Poisoning Attack Detection Method**  
+IJCAI 2025 Accepted Paper
 
-This repository contains comparative experiments on **poison-sample detection for deep-learning models**.
-We evaluate several algorithms—**DCM**, **LossScan**, **AutoencoderScan**, **Meta-Sift**, and the proposed **Q-Detection**—under three canonical poisoning scenarios (label-flipping, Narcissus, BadNets).
-Performance is reported with two primary metrics:
+---
 
-* **NCR (Normalized Contamination Rate)** – lower is better (ideal 0 %, random baseline ≈ 100 %);
-* **Post-filter Accuracy** – overall test accuracy and target-label accuracy after removing suspicious samples.
+## 🚀 Project Overview
 
-Q-Detection, a quantum-accelerated method, is shown to achieve the best balance between NCR and accuracy.
+This repository implements and benchmarks several poison-sample detection algorithms for deep-learning models under three canonical poisoning scenarios:
 
+- **Label-Flipping**  
+- **Narcissus**  
+- **BadNets**
 
-## Core Features
+We compare:
 
-* **Algorithm Benchmarks** – DCM, LossScan, AutoencoderScan, Q-Detection, Meta-Sift.
-* **Attack Coverage** – targeted label-flipping, Narcissus, and BadNets.
-* **Flexible Hyper-parameters** – poisoning rate (3 % – 30 %), number of samples kept (`subset_num`), etc.
+- **DCM**  
+- **LossScan**  
+- **AutoencoderScan**  
+- **Meta-Sift**  
+- **Q-Detection** (our proposed quantum-accelerated method)
 
-## Experimental Configuration
+**Metrics**  
+- **NCR**: lower is better (ideal 0 %, random ≈ 100 %)  
+- **Post-filter Accuracy**: test accuracy (overall and target-class) after filtering
 
-| Parameter    | Meaning                          | Example                                                   |
-| ------------ | -------------------------------- | --------------------------------------------------------- |
-| `methodname` | Attack type                      | `"targeted_label_filpping"` / `"narcissus"` / `"badnets"` |
-| `rate`       | Poisoning rate (%)               | `3`, `5`, `10`, `20`, `30`                                |
-| `subset_num` | # samples selected by the filter | `4000` (default)                                          |
+---
 
-## How to Run
+## 🔧 Installation
 
-1. **Set up the environment**
-
+1. Create and activate a virtual environment:
    ```bash
    python -m venv venv
    source venv/bin/activate
-   pip install -r requirements.txt
    ```
-   Download dataset gtsrb_dataset.h5 form this link https://drive.google.com/file/d/1SKYMwrnjEyFjjc7UWTdAyAjFI_demNtD/view and put it under './dataset' folder.
-    
-2. **Adjust hyper-parameters** in `main.py` (`methodname`, `rate`, `subset_num`).
-3. **Launch** via an IDE run of `main.py` or:
+
+2. Install dependencies:
 
    ```bash
-   python main.py
+   pip install -r requirements.txt
    ```
+3. Download the GTSRB dataset archive
+   Place `gtsrb_dataset.h5` under `./dataset/` (see link below).
 
-   The script prints each method’s NCR and the accuracy of the model retrained on the filtered dataset.
 
-## Dependencies
+## ⚙️ Configuration
 
-Add the following to **requirements.txt** (tested with Python ≥ 3.8):
+Edit the hyperparameters in `main.py` (or pass via CLI if you extend):
 
+| Parameter    | Description                               | Example                                                 |
+| ------------ | ----------------------------------------- | ------------------------------------------------------- |
+| `methodname` | Attack type                               | `"targeted_label_flipping"`, `"narcissus"`, `"badnets"` |
+| `rate`       | Poisoning rate (%)                        | `3`, `5`, `10`, `20`, `30`                              |
+| `subset_num` | Number of samples to keep after filtering | `4000` (default)                                        |
+
+Download link for the dataset:
+[https://drive.google.com/file/d/1SKYMwrnjEyFjjc7UWTdAyAjFI\_demNtD/view](https://drive.google.com/file/d/1SKYMwrnjEyFjjc7UWTdAyAjFI_demNtD/view)
+
+---
+
+## ▶️ Usage
+
+Run the main script directly:
+
+```bash
+python main.py
 ```
+
+This will:
+
+1. Load the specified poisoning scenario and rate
+2. Apply each detection method
+3. Print NCR and post-filter test accuracies
+
+---
+
+## 📦 Dependencies
+
+```text
 torch>=1.9.0
 torchvision>=0.10.0
 numpy>=1.21.0
 scikit-learn>=1.0.2
 Pillow>=8.3.2
+h5py>=3.2.1
 tqdm>=4.64.0
-h5py>=3.2.1               # for HDF5 datasets
-dimod>=0.12.1             # binary quadratic models
-neal>=0.5.8               # simulated annealing sampler
-dwave-system>=1.17.0      # optional: run on real QA hardware
-kaiwu>=0.1.0              # Kaiwu SDK for CIM simulation
-matplotlib>=3.4.3         # plotting (optional)
-```# Q-Detection-A-Quantum-Classical-Hybrid-Poisoning-Attack-Detection-Method
+dimod>=0.12.1
+neal>=0.5.8
+dwave-system>=1.17.0
+```
+
+*(Tested with Python ≥ 3.8), Windows and Linux.*
+
+---
+
+## 📖 Citation
+
+If you use this code, please cite:
+
+```bibtex
+@article{he2025q,
+  title={Q-Detection: A Quantum-Classical Hybrid Poisoning Attack Detection Method},
+  author={He, Haoqi and Lin, Xiaokai and Chen, Jiancai and Xiao, Yan},
+  journal={arXiv preprint arXiv:2507.06262},
+  year={2025}
+}
+```
+
+---
+
+## 🔗 Links
+
+* **Paper (arXiv)**: [https://arxiv.org/abs/2507.06262](https://arxiv.org/abs/2507.06262)
+* **Dataset (GTSRB)**: [https://drive.google.com/file/d/1SKYMwrnjEyFjjc7UWTdAyAjFI\_demNtD/view](https://drive.google.com/file/d/1SKYMwrnjEyFjjc7UWTdAyAjFI_demNtD/view)
+
+

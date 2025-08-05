@@ -1,17 +1,11 @@
 import os
 from torch import autocast, optim
 
-from dc import DCM
 # from QDetection import *
-from QDetection.QDetectionfunc import *
 from torch.utils.data import DataLoader, Subset
-
 from torchvision import models
 
-device = 'cpu' #'cuda'
-# torch.cuda.set_device(0)
 
-set_seed(0)
 # methodname = targeted_label_filpping  narcissus  badnets
 import torch
 import torch.nn as nn
@@ -153,14 +147,14 @@ def set_seeds(seed: int = 42) -> None:
     print(f"Random seed set as {seed}")
 
 
-def get_results(model, data_set):
+def get_results(model, data_set, args):
     data_loader = torch.utils.data.DataLoader(data_set, batch_size=128, num_workers=4, shuffle=False)
     model = model.eval()
     correct = 0
     total = 0
     with torch.no_grad():
         for batch_idx, (data) in enumerate(data_loader):
-            inputs, targets = data[0].cuda(), data[1].cuda()
+            inputs, targets = data[0].to(args.device), data[1].to(args.device)
             outputs = model(inputs)
             _, predicted = outputs.max(1)
             total += targets.size(0)
@@ -202,10 +196,10 @@ def warmup(model, optimizer, data_loader, args):
     for w_i in range(args.warmup_epochs):
         for iters, (input_train, target_train) in enumerate(data_loader):
             model.train()
-            input_var, target_var = input_train.cuda(), target_train.cuda()
+            input_var, target_var = input_train.to(args.device), target_train.to(args.device)
             optimizer.zero_grad()
 
-            with autocast():
+            with autocast(device_type=args.device):
                 outputs = model(input_var)
                 loss = F.cross_entropy(outputs, target_var)
             loss.backward()
@@ -238,7 +232,7 @@ def compute_gated_grad(grads, grad_models, num_opt, num_act):
     for grad in grads[0:-num_opt]:
         new_grads.append(grad.detach())
     for g_id, grad in enumerate(grads[-num_opt:-2]):
-        grad_act = grad_function(grad, grad_models[g_id])  # 这是用来干嘛的？
+        grad_act = grad_function(grad, grad_models[g_id]) 
         if grad_act > 0.5:
             new_grads.append(grad_act * grad)
         else:
@@ -250,14 +244,14 @@ def compute_gated_grad(grads, grad_models, num_opt, num_act):
     return new_grads, act_loss
 
 
-def to_var(x, requires_grad=True):
+def to_var(x, args, requires_grad=True):
     if torch.cuda.is_available():
-        x = x.cuda()
+        x = x.to(args.device)
     return Variable(x, requires_grad=requires_grad)
 
 
 class nnGradGumbelSoftmax(nn.Module):
-    def __init__(self, input, hidden, input_norm=False):
+    def __init__(self, input, hidden, args, input_norm=False):
         super(nnGradGumbelSoftmax, self).__init__()
         # self.bn = MetaBatchNorm1d(input)
         self.linear1 = nn.Linear(input, hidden)
@@ -266,8 +260,8 @@ class nnGradGumbelSoftmax(nn.Module):
         self.relu2 = nn.PReLU()
 
         self.act = nn.Linear(hidden, 2)
-        self.register_buffer('weight_act', to_var(self.act.weight.data, requires_grad=True))
-        self.register_buffer('bias_act', to_var(self.act.bias.data, requires_grad=True))
+        self.register_buffer('weight_act', to_var(self.act.weight.data, args=args, requires_grad=True))
+        self.register_buffer('bias_act', to_var(self.act.bias.data, args=args, requires_grad=True))
         self.input_norm = input_norm
 
     def forward(self, x):
@@ -312,8 +306,8 @@ def gumbel_softmax(logits, temperature=5):
 
 def build_thres_model(args, weight_shape):
     hidden_dim = 128
-    model = nnGradGumbelSoftmax(weight_shape[0], hidden_dim, input_norm=True)
-    model.cuda()
+    model = nnGradGumbelSoftmax(weight_shape[0], hidden_dim, args, input_norm=True)
+    model.to(args.device)
     return model
 
 

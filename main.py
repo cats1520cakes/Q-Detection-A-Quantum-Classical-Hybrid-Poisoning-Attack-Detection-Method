@@ -1,25 +1,19 @@
-from torch import optim
+import torch
 from dc import DCM
 from QDetection.util import *
 from QDetection.QDetectionfunc import *
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 set_seed(0)
 # methodname = targeted_label_filpping  narcissus  badnets
 import torch
-import torch.nn as nn
 from torchvision import models, transforms
-from torch.utils.data import DataLoader, Subset, Dataset
-from sklearn.metrics import accuracy_score
-import numpy as np
-import random
 
 
 
 def exp(methodname, poi_rate, subset_num):
     # load dataset
     data_transform = transforms.Compose([transforms.ToTensor(),])
-    train_path = './dataset/gtsrb_dataset.h5'
+    train_path = 'D:\QuantumDeepLearningOfHHQ\IJCAI Qdetection Github Code\dataset\gtsrb_dataset.h5'
     # Load the poisoned train dataset
     trainset = h5_dataset(train_path, True, None)
     train_poi_set, poi_idx = poi_dataset(trainset, poi_methond=methodname, transform=data_transform, poi_rates=poi_rate/100, random_seed=0, tar_lab=38)
@@ -66,6 +60,7 @@ def exp(methodname, poi_rate, subset_num):
         nesterov = True
         # Random seed
         random_seed = 0
+        device ='cuda' if torch.cuda.is_available() else 'cpu'
     args=Args()
 
         
